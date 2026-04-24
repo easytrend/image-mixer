@@ -143,18 +143,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
 
 /* ── Mobile responsive ── */
 @media(max-width:600px){
-  /* Allow full-page vertical scrolling on mobile */
-  body{overflow-y:auto;overflow-x:hidden}
-  #app{height:auto;min-height:100dvh;min-height:100vh;overflow:visible}
-  #body{overflow:visible;flex-direction:column}
+  /* 1. Allow full-page scrolling */
+  body{overflow:auto}
+  /* 2. Let the app grow to fit content */
+  #app{height:auto;min-height:100vh;overflow:visible}
 
-  /* Sidebar goes horizontal across the top on mobile */
-  #sidebar{width:100%;height:auto;border-right:none;border-bottom:1px solid #1e1e2e;flex-direction:row;flex-wrap:wrap;align-items:center;padding:4px 8px;gap:6px}
-  #sidebar-header{display:none}
-  .side-btn{margin:0;font-size:9px;padding:5px 10px}
-  #layers-lbl{display:none}
-  #layers-list{display:flex;flex-direction:row;overflow-x:auto;flex:1;padding:2px 0;gap:4px;-webkit-overflow-scrolling:touch}
-  .layer-item{flex-shrink:0;padding:3px 5px;margin:0}
+  /* Sidebar */
+  #sidebar{width:90px}
+  #sidebar-header{font-size:10px;padding:6px 7px}
+  .side-btn{font-size:9px;padding:5px 4px;margin:5px 6px 0}
+  #layers-lbl{font-size:8px;padding:3px 7px 2px}
   .layer-label{display:none}
   .layer-vis,.layer-del{font-size:10px}
   .hero-badge{display:none}
@@ -164,7 +162,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
   #nav-lparmy{font-size:9px;padding:3px 6px}
   #topnav{padding:0 8px;gap:7px;height:36px}
 
-  /* Toolbar scrolls horizontally */
+  /* Toolbar — scrollable horizontally */
   #toolbar{padding:4px 5px;gap:2px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
   .tb-btn{font-size:9px;padding:2px 5px;height:18px;flex-shrink:0}
   .tb-label{font-size:9px;flex-shrink:0}
@@ -174,18 +172,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
   .txt-select{font-size:8px;height:16px;flex-shrink:0}
   .txt-btn{font-size:9px;height:16px;padding:1px 4px;flex-shrink:0}
 
-  /* Canvas fills width */
-  #main{overflow:visible;min-width:0}
-  #canvas-wrap{overflow:auto;min-height:240px;-webkit-overflow-scrolling:touch}
-
-  /* Bottom bar: column layout + tools row scrollable + save button full-width */
+  /* Bottom bar — stacked column, tools swipe horizontally */
   #bottom-bar{flex-direction:column;align-items:stretch;padding:8px;gap:6px}
-  .bb-row{display:flex;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;gap:5px}
+  .bb-row{display:flex;align-items:center;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;gap:5px}
   .bb-lbl{font-size:9px;flex-shrink:0}
   #bg-color{flex-shrink:0}
   #bg-pattern,#fmt-sel,#res-sel,#quality-sel{font-size:9px;height:20px;flex-shrink:0}
   #bg-img-btn{font-size:9px;height:20px;flex-shrink:0}
-  /* Save button — full-width, tall, easy to tap */
+
+  /* 3. Save button — full-width, obvious, easy to tap */
   #bb-row-save{width:100%}
   #save-btn{margin-left:0;width:100%;font-size:14px;padding:12px 0;text-align:center;border-radius:8px;border:2px solid #ff6b2b;background:#1e0d05;color:#ff6b2b;font-weight:700;cursor:pointer;letter-spacing:.3px}
   #save-btn:active{background:#ff6b2b;color:#fff}
