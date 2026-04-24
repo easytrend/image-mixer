@@ -76,6 +76,21 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
 .szn{font-size:7px;color:#2a2a3a;white-space:nowrap}
 #canvas-wrap{flex:1;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;background:#07070e}
 #canvas{position:relative;overflow:hidden;background:#fff;flex-shrink:0}
+/* Grid overlay */
+#grid-overlay{position:absolute;inset:0;pointer-events:none;z-index:998}
+.grid-line-h,.grid-line-v{position:absolute;background:rgba(100,160,255,0.18)}
+.grid-line-h{left:0;right:0;height:1px}
+.grid-line-v{top:0;bottom:0;width:1px}
+.grid-label-h,.grid-label-v{position:absolute;font-size:7px;color:rgba(100,160,255,0.55);font-weight:700;pointer-events:none;background:rgba(0,0,0,0.25);padding:0 2px;border-radius:2px;line-height:1.4}
+.grid-label-h{left:2px}
+.grid-label-v{bottom:2px;transform:translateX(-50%)}
+/* Snap lines (red alignment guides) */
+.snap-line{position:absolute;background:rgba(255,80,80,0.7);pointer-events:none;z-index:999}
+.snap-line.h{left:0;right:0;height:1px}
+.snap-line.v{top:0;bottom:0;width:1px}
+/* Grid toggle button */
+#grid-btn{font-size:10px;padding:3px 7px;cursor:pointer;border-radius:4px;border:.5px solid #2a2a3a;background:#161620;color:#ffffff;font-weight:700;height:20px}
+#grid-btn.on{background:#0d1a2a;color:#4a9edd;border-color:#1a3a5a}
 .hero-ring{position:absolute;border:2px dashed rgba(255,107,43,.4);border-radius:4px;pointer-events:none;z-index:1000;display:flex;align-items:center;justify-content:center}
 .hero-lbl{font-size:9px;color:rgba(255,107,43,.8);background:rgba(0,0,0,.6);padding:1px 5px;border-radius:2px}
 .c-node{position:absolute;user-select:none;touch-action:none;cursor:grab}
@@ -101,7 +116,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
 #bottom-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;border-top:1px solid #1e1e2e;background:#0d0d12;flex-wrap:wrap}
 .bb-lbl{font-size:10px;color:#fff;font-weight:700}
 #bg-color{width:22px;height:22px;border:.5px solid #2a2a3a;border-radius:3px;cursor:pointer;padding:0}
-#bg-pattern,#fmt-sel,#res-sel{font-size:10px;padding:2px 4px;border-radius:4px;border:.5px solid #2a2a3a;background:#161620;color:#ffffff;font-weight:700;height:20px}
+#bg-pattern,#fmt-sel,#res-sel,#quality-sel{font-size:10px;padding:2px 4px;border-radius:4px;border:.5px solid #2a2a3a;background:#161620;color:#ffffff;font-weight:700;height:20px}
 #bg-img-btn{font-size:10px;padding:2px 8px;cursor:pointer;border-radius:4px;border:.5px solid #333;background:#161620;color:#ffffff;font-weight:700;height:20px}
 #bg-img-btn:hover{background:#222;color:#fff}
 #save-btn{margin-left:auto;font-size:11px;padding:4px 12px;cursor:pointer;border-radius:5px;border:1px solid #ff6b2b55;background:#1e0d05;color:#ff6b2b;font-weight:600}
@@ -127,8 +142,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
 
 /* ── Mobile responsive ── */
 @media(max-width:600px){
-  body{overflow:auto}
-  #app{height:auto;min-height:100vh}
   #sidebar{width:90px}
   #sidebar-header{font-size:10px;padding:6px 7px}
   .side-btn{font-size:9px;padding:5px 4px;margin:5px 6px 0}
@@ -149,36 +162,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
   .txt-btn{font-size:9px;height:16px;padding:1px 4px}
   #bottom-bar{padding:4px 7px;gap:4px}
   .bb-lbl{font-size:9px}
-  #save-btn{font-size:9px;padding:7px 10px;margin-left:0;width:100%}
+  #save-btn{font-size:9px;padding:3px 8px}
   #bg-pattern,#fmt-sel,#res-sel{font-size:9px;height:18px}
   #bg-img-btn{font-size:9px;height:18px}
   #sig-modal{width:92vw;padding:12px}
-}
-
-/* ── Touch devices (incl. "Desktop site" on phones) ── */
-@media (hover:none) and (pointer:coarse){
-  body{overflow:auto}
-  #app{height:auto;min-height:100vh}
-  #body,#main{overflow:visible}
-
-  /* Keep tools reachable even if bars wrap */
-  #bottom-bar{
-    position:sticky;
-    bottom:0;
-    z-index:5000;
-  }
-}
-
-/* Short viewports (landscape phones) */
-@media (max-height:520px){
-  body{overflow:auto}
-  #app{height:auto;min-height:100vh}
-  #body,#main{overflow:visible}
-  #bottom-bar{
-    position:sticky;
-    bottom:0;
-    z-index:5000;
-  }
 }
 </style>
 </head>
@@ -240,6 +227,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
         <button class="tb-btn" id="btn-fh">Flip H</button>
         <button class="tb-btn" id="btn-fv">Flip V</button>
         <button class="tb-btn" id="btn-del" style="color:#ff6666;font-weight:700">Del</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" id="grid-btn" title="Toggle grid">Grid</button>
+        <select id="grid-size" style="font-size:10px;padding:2px 3px;border-radius:4px;border:.5px solid #2a2a3a;background:#161620;color:#fff;font-weight:700;height:20px">
+          <option value="20">20px</option>
+          <option value="30" selected>30px</option>
+          <option value="40">40px</option>
+          <option value="60">60px</option>
+          <option value="80">80px</option>
+        </select>
       </div>
 
       <div id="txt-bar">
@@ -286,6 +282,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
 
       <div id="canvas-wrap">
         <div id="canvas" style="width:480px;height:360px">
+          <div id="grid-overlay"></div>
           <div class="hero-ring" id="hero-ring"><span class="hero-lbl">Hero slot</span></div>
           <div id="empty-hint"><div class="big">+</div><p>Upload images or add text</p></div>
         </div>
@@ -302,8 +299,22 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
         <button id="bg-img-btn" onclick="document.getElementById('bg-img-input').click()">BG image</button>
         <input type="file" id="bg-img-input" accept="image/*">
         <span class="bb-lbl" style="margin-left:6px">Fmt:</span>
-        <select id="fmt-sel"><option value="png">PNG</option><option value="jpeg">JPG</option></select>
-        <select id="res-sel"><option value="1">1x</option><option value="2">2x</option></select>
+        <select id="fmt-sel"><option value="png">PNG</option><option value="jpeg">JPG</option><option value="webp">WebP</option></select>
+        <select id="res-sel" title="Export resolution — higher = sharper & larger file">
+          <option value="1">1x — Draft</option>
+          <option value="2">2x — Good</option>
+          <option value="3" selected>3x — Sharp</option>
+          <option value="4">4x — HD</option>
+          <option value="6">6x — Ultra</option>
+          <option value="8">8x — Max</option>
+        </select>
+        <select id="quality-sel" title="JPG/WebP quality (PNG is always lossless)">
+          <option value="0.80">Q 80%</option>
+          <option value="0.90">Q 90%</option>
+          <option value="0.95" selected>Q 95%</option>
+          <option value="0.98">Q 98%</option>
+          <option value="1.00">Q 100%</option>
+        </select>
         <button id="save-btn">⬇ Save / Download</button>
       </div>
     </div>
@@ -391,6 +402,94 @@ function updateHist(){btnUndo.disabled=histIdx<=0;btnRedo.disabled=histIdx>=hist
 function restoreSnap(s){_sup=true;const st=JSON.parse(s);nodes=st.nodes;selectedId=st.selectedId;heroId=st.heroId;bgColorEl.value=st.bg||'#ffffff';bgPatEl.value=st.pat||'none';applyBg();rebuildCanvas();_sup=false;}
 function rebuildCanvas(){document.querySelectorAll('.c-node').forEach(e=>e.remove());nodes.forEach(n=>buildEl(n));if(selectedId){const el=getEl(selectedId);if(el){el.classList.add('selected');if(getNode(selectedId)?.type==='text')el.classList.add('txt-selected');}const n=getNode(selectedId);if(n&&n.type==='img'){opSl.value=Math.round(n.opacity*100);opVal.textContent=Math.round(n.opacity*100)+'%';blendSel.value=n.blend||'normal';}}emptyHint.style.display=nodes.length?'none':'';updateInspector();renderLayers();}
 
+// ── GRID SYSTEM ──
+let gridOn=false;
+const gridOverlay=document.getElementById('grid-overlay');
+const gridBtn=document.getElementById('grid-btn');
+const gridSizeSel=document.getElementById('grid-size');
+
+function drawGrid(){
+  gridOverlay.innerHTML='';
+  if(!gridOn)return;
+  const step=parseInt(gridSizeSel.value)||30;
+  // horizontal lines
+  for(let y=step;y<CH;y+=step){
+    const line=document.createElement('div');line.className='grid-line-h';line.style.top=y+'px';
+    const lbl=document.createElement('div');lbl.className='grid-label-h';lbl.style.top=(y-8)+'px';lbl.textContent=y+'px';
+    gridOverlay.appendChild(line);gridOverlay.appendChild(lbl);
+  }
+  // vertical lines
+  for(let x=step;x<CW;x+=step){
+    const line=document.createElement('div');line.className='grid-line-v';line.style.left=x+'px';
+    const lbl=document.createElement('div');lbl.className='grid-label-v';lbl.style.left=x+'px';lbl.textContent=x+'px';
+    gridOverlay.appendChild(line);gridOverlay.appendChild(lbl);
+  }
+  // center crosshairs (stronger)
+  const ch=document.createElement('div');ch.className='grid-line-h';ch.style.top=(CH/2)+'px';ch.style.background='rgba(255,107,43,0.3)';ch.style.height='1px';gridOverlay.appendChild(ch);
+  const cv=document.createElement('div');cv.className='grid-line-v';cv.style.left=(CW/2)+'px';cv.style.background='rgba(255,107,43,0.3)';cv.style.width='1px';gridOverlay.appendChild(cv);
+}
+
+gridBtn.onclick=()=>{gridOn=!gridOn;gridBtn.classList.toggle('on',gridOn);drawGrid();};
+gridSizeSel.onchange=()=>{if(gridOn)drawGrid();};
+
+// ── SNAP-TO-GRID helper ──
+const SNAP_THRESH=8;
+function snapToGrid(val,step){
+  const snapped=Math.round(val/step)*step;
+  return Math.abs(val-snapped)<SNAP_THRESH?snapped:val;
+}
+
+// ── ALIGNMENT SNAP GUIDES ──
+function showSnapLines(n){
+  clearSnapLines();
+  if(!gridOn)return;
+  const step=parseInt(gridSizeSel.value)||30;
+  // Check edges and center of dragged node
+  const edges={x:[n.x, n.x+n.w/2, n.x+n.w], y:[n.y, n.y+n.h/2, n.y+n.h]};
+  // Check against other nodes
+  const others=nodes.filter(o=>o.id!==n.id&&o.visible!==false);
+  const vSnaps=new Set(), hSnaps=new Set();
+
+  others.forEach(o=>{
+    const oe={x:[o.x, o.x+o.w/2, o.x+o.w], y:[o.y, o.y+o.h/2, o.y+o.h]};
+    edges.x.forEach(ex=>oe.x.forEach(ox=>{if(Math.abs(ex-ox)<SNAP_THRESH)vSnaps.add(Math.round(ox));}));
+    edges.y.forEach(ey=>oe.y.forEach(oy=>{if(Math.abs(ey-oy)<SNAP_THRESH)hSnaps.add(Math.round(oy));}));
+  });
+
+  // Also snap to grid lines
+  edges.x.forEach(ex=>{const sg=snapToGrid(ex,step);if(sg!==ex)vSnaps.add(sg);});
+  edges.y.forEach(ey=>{const sg=snapToGrid(ey,step);if(sg!==ey)hSnaps.add(sg);});
+
+  vSnaps.forEach(x=>{const l=document.createElement('div');l.className='snap-line v';l.style.left=x+'px';l.id='sl_v_'+x;canvas.appendChild(l);});
+  hSnaps.forEach(y=>{const l=document.createElement('div');l.className='snap-line h';l.style.top=y+'px';l.id='sl_h_'+y;canvas.appendChild(l);});
+}
+function clearSnapLines(){document.querySelectorAll('.snap-line').forEach(e=>e.remove());}
+
+// Apply snap when dragging (called from setupImgDrag pointermove)
+function applySnapPos(n){
+  if(!gridOn)return;
+  const step=parseInt(gridSizeSel.value)||30;
+  // snap left edge / center / right edge to grid
+  const sx=snapToGrid(n.x,step);
+  const scx=snapToGrid(n.x+n.w/2,step)-n.w/2;
+  const srx=snapToGrid(n.x+n.w,step)-n.w;
+  const sy=snapToGrid(n.y,step);
+  const scy=snapToGrid(n.y+n.h/2,step)-n.h/2;
+  const sry=snapToGrid(n.y+n.h,step)-n.h;
+  const bestX=[sx,scx,srx].reduce((a,b)=>Math.abs(a-n.x)<Math.abs(b-n.x)?a:b);
+  const bestY=[sy,scy,sry].reduce((a,b)=>Math.abs(a-n.y)<Math.abs(b-n.y)?a:b);
+  if(Math.abs(bestX-n.x)<SNAP_THRESH)n.x=Math.round(bestX);
+  if(Math.abs(bestY-n.y)<SNAP_THRESH)n.y=Math.round(bestY);
+  // snap to other nodes
+  const others=nodes.filter(o=>o.id!==n.id&&o.visible!==false);
+  others.forEach(o=>{
+    const oe={x:[o.x,o.x+o.w/2,o.x+o.w],y:[o.y,o.y+o.h/2,o.y+o.h]};
+    [n.x,n.x+n.w/2,n.x+n.w].forEach((ex,ei)=>{oe.x.forEach(ox=>{if(Math.abs(ex-ox)<SNAP_THRESH){if(ei===0)n.x=Math.round(ox);else if(ei===1)n.x=Math.round(ox-n.w/2);else n.x=Math.round(ox-n.w);}});});
+    [n.y,n.y+n.h/2,n.y+n.h].forEach((ey,ei)=>{oe.y.forEach(oy=>{if(Math.abs(ey-oy)<SNAP_THRESH){if(ei===0)n.y=Math.round(oy);else if(ei===1)n.y=Math.round(oy-n.h/2);else n.y=Math.round(oy-n.h);}});});
+  });
+  showSnapLines(n);
+}
+
 btnUndo.onclick=()=>{if(histIdx<=0)return;histIdx--;restoreSnap(history[histIdx]);updateHist();};
 btnRedo.onclick=()=>{if(histIdx>=history.length-1)return;histIdx++;restoreSnap(history[histIdx]);updateHist();};
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();btnUndo.click();}if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();btnRedo.click();}});
@@ -455,7 +554,7 @@ function setupImgDrag(el,n){
   });
   el.addEventListener('pointermove',e=>{
     if(!mode)return;const dx=e.clientX-sx,dy=e.clientY-sy;moved=true;
-    if(mode==='drag'){n.x=ox+dx;n.y=oy+dy;}
+    if(mode==='drag'){n.x=ox+dx;n.y=oy+dy;applySnapPos(n);}
     else if(mode==='rot'){const r=el.getBoundingClientRect();n.rot=Math.round(Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI+90);}
     else{const ratio=ow/oh;let nw=ow,nh=oh,nx=ox,ny=oy;
       if(mode==='se'){nw=Math.max(20,ow+dx);nh=Math.max(20,oh+dy);if(ratioLocked){const d2=Math.max(dx,dy);nw=Math.max(20,ow+d2);nh=nw/ratio;}}
@@ -465,7 +564,7 @@ function setupImgDrag(el,n){
       n.w=Math.round(nw);n.h=Math.round(nh);n.x=Math.round(nx);n.y=Math.round(ny);}
     applyNodeStyle(el,n);updateSzTag(n);updateInspector();e.preventDefault();
   });
-  el.addEventListener('pointerup',()=>{if(moved)snap();mode=null;moved=false;});
+  el.addEventListener('pointerup',()=>{clearSnapLines();if(moved)snap();mode=null;moved=false;});
 }
 
 function setupTxtDrag(el,n){
@@ -481,12 +580,12 @@ function setupTxtDrag(el,n){
   });
   el.addEventListener('pointermove',e=>{
     if(!mode)return;const dx=e.clientX-sx,dy=e.clientY-sy;moved=true;
-    if(mode==='drag'){n.x=ox+dx;n.y=oy+dy;}
+    if(mode==='drag'){n.x=ox+dx;n.y=oy+dy;applySnapPos(n);}
     else if(mode==='resize'){n.w=Math.max(30,ow+dx);n.h=Math.max(16,oh+dy);}
     else if(mode==='rot'){const r=el.getBoundingClientRect();n.rot=Math.round(Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI+90);}
     applyNodeStyle(el,n);e.preventDefault();
   });
-  el.addEventListener('pointerup',()=>{if(moved)snap();mode=null;moved=false;});
+  el.addEventListener('pointerup',()=>{clearSnapLines();if(moved)snap();mode=null;moved=false;});
 }
 
 function selectNode(id){
@@ -538,14 +637,51 @@ canvas.addEventListener('dragover',e=>e.preventDefault());
 canvas.addEventListener('drop',e=>{e.preventDefault();[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')).forEach(f=>{const r=new FileReader();r.onload=ev=>addImage(ev.target.result,f.name.replace(/\.[^.]+$/,'').slice(0,14));r.readAsDataURL(f);});});
 
 document.getElementById('save-btn').onclick=async()=>{
-  const fmt=document.getElementById('fmt-sel').value,res=parseInt(document.getElementById('res-sel').value);
+  const fmt=document.getElementById('fmt-sel').value;
+  const res=parseInt(document.getElementById('res-sel').value);
+  const quality=parseFloat(document.getElementById('quality-sel').value);
+  const outW=CW*res, outH=CH*res;
+
   heroRing.style.display='none';
+  gridOverlay.style.display='none';
   document.querySelectorAll('.c-node').forEach(el=>{el.classList.remove('selected','txt-selected');});
   document.querySelectorAll('.handle,.rot-handle,.size-tag').forEach(el=>el.style.display='none');
   document.querySelectorAll('.txt-editor').forEach(el=>{el.style.opacity='0';el.classList.remove('active');});
-  try{const c2=await html2canvas(canvas,{scale:res,useCORS:true,allowTaint:true,backgroundColor:null,logging:false});const a=document.createElement('a');a.href=c2.toDataURL('image/'+fmt,0.95);a.download='canvas.'+fmt;a.click();}
-  catch(err){alert('Export failed — try 1x or JPG format.');}
-  finally{heroRing.style.display='flex';document.querySelectorAll('.handle,.rot-handle').forEach(el=>el.style.display='');document.querySelectorAll('.size-tag').forEach(el=>el.style.display='');if(selectedId){const el=getEl(selectedId);if(el){el.classList.add('selected');if(getNode(selectedId)?.type==='text')el.classList.add('txt-selected');}}}
+  document.querySelectorAll('.snap-line').forEach(el=>el.remove());
+
+  try{
+    const c2=await html2canvas(canvas,{
+      scale:res,
+      useCORS:true,
+      allowTaint:true,
+      backgroundColor:null,
+      logging:false,
+      imageTimeout:0,
+    });
+
+    // Apply extra sharpening pass via offscreen canvas with high-quality resampling
+    const sharp=document.createElement('canvas');
+    sharp.width=outW;sharp.height=outH;
+    const sctx=sharp.getContext('2d');
+    sctx.imageSmoothingEnabled=true;
+    sctx.imageSmoothingQuality='high';
+    sctx.drawImage(c2,0,0,outW,outH);
+
+    const mimeType=fmt==='jpeg'?'image/jpeg':fmt==='webp'?'image/webp':'image/png';
+    const dataUrl=fmt==='png'?sharp.toDataURL('image/png'):sharp.toDataURL(mimeType,quality);
+    const a=document.createElement('a');
+    a.href=dataUrl;
+    a.download='mycard_'+outW+'x'+outH+(fmt==='jpeg'?'.jpg':'.'+fmt);
+    a.click();
+  }
+  catch(err){alert('Export failed — try a lower resolution or JPG format.');}
+  finally{
+    heroRing.style.display='flex';
+    gridOverlay.style.display='';
+    document.querySelectorAll('.handle,.rot-handle').forEach(el=>el.style.display='');
+    document.querySelectorAll('.size-tag').forEach(el=>el.style.display='');
+    if(selectedId){const el=getEl(selectedId);if(el){el.classList.add('selected');if(getNode(selectedId)?.type==='text')el.classList.add('txt-selected');}}
+  }
 };
 
 const sigWrap=document.getElementById('sig-modal-wrap');
