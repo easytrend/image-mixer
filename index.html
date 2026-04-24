@@ -319,6 +319,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
           </select>
           <button id="bg-img-btn" onclick="document.getElementById('bg-img-input').click()">BG Image</button>
           <input type="file" id="bg-img-input" accept="image/*">
+          <span class="bb-lbl" id="bgz-lbl" style="display:none;flex-shrink:0;margin-left:3px">🔍</span>
+          <input type="range" id="bg-zoom" min="30" max="300" value="100" step="5" title="BG Image Zoom" style="display:none;width:64px;accent-color:#ff6b2b;flex-shrink:0">
+          <span id="bg-zoom-val" style="display:none;font-size:9px;color:#ff6b2b;font-weight:700;flex-shrink:0;min-width:30px">100%</span>
+          <input type="range" id="bg-pos-x" min="0" max="100" value="50" step="1" title="Pan ⇔ Horizontal" style="display:none;width:50px;accent-color:#aaa;flex-shrink:0">
+          <input type="range" id="bg-pos-y" min="0" max="100" value="50" step="1" title="Pan ⇕ Vertical" style="display:none;width:50px;accent-color:#aaa;flex-shrink:0">
           <span class="bb-lbl" style="margin-left:2px">Fmt:</span>
           <select id="fmt-sel"><option value="png">PNG</option><option value="jpeg">JPG</option><option value="webp">WebP</option></select>
           <select id="res-sel" title="Export resolution">
@@ -652,9 +657,16 @@ document.getElementById('btn-fv').onclick=()=>{const n=getNode(selectedId);if(!n
 document.getElementById('btn-del').onclick=()=>{if(selectedId)deleteNode(selectedId);};
 
 function applyBg(){const c=bgColorEl.value,p=bgPatEl.value;let bg=c;if(p==='dots')bg='radial-gradient(circle,#0004 1px,transparent 1px) 0 0/18px 18px,'+c;else if(p==='grid')bg='linear-gradient('+c+'44 1px,transparent 1px) 0 0/20px 20px,linear-gradient(90deg,'+c+'44 1px,transparent 1px) 0 0/20px 20px,'+c;else if(p==='diagonal')bg='repeating-linear-gradient(45deg,#0002 0,#0002 1px,transparent 1px,transparent 10px),'+c;else if(p==='checker'){const h=c.replace('#','');const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);const dd='rgba('+Math.max(0,r-30)+','+Math.max(0,g-30)+','+Math.max(0,b-30)+',1)';bg='repeating-conic-gradient('+c+' 0 25%,'+dd+' 0 50%) 0 0/20px 20px';}canvas.style.background=bg;}
-bgColorEl.oninput=()=>{canvas._bgImg=false;applyBg();};bgColorEl.onchange=()=>snap();
-bgPatEl.onchange=()=>{canvas._bgImg=false;applyBg();snap();};
-document.getElementById('bg-img-input').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{canvas.style.background='none';canvas.style.backgroundImage='url('+ev.target.result+')';canvas.style.backgroundSize='cover';canvas.style.backgroundPosition='center';canvas._bgImg=true;snap();};r.readAsDataURL(f);e.target.value='';};
+bgColorEl.oninput=()=>{canvas._bgImg=false;showBgZoomCtrl(false);applyBg();};bgColorEl.onchange=()=>snap();
+bgPatEl.onchange=()=>{canvas._bgImg=false;showBgZoomCtrl(false);applyBg();snap();};
+// BG image zoom/pan state
+let bgZoom=100,bgPosX=50,bgPosY=50;
+function showBgZoomCtrl(on){['bgz-lbl','bg-zoom','bg-zoom-val','bg-pos-x','bg-pos-y'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=on?'inline-block':'none';});}
+function applyBgZoom(){if(!canvas._bgImg)return;canvas.style.backgroundSize=bgZoom+'%';canvas.style.backgroundPosition=bgPosX+'% '+bgPosY+'%';canvas.style.backgroundRepeat='no-repeat';}
+document.getElementById('bg-zoom').oninput=e=>{bgZoom=e.target.value;document.getElementById('bg-zoom-val').textContent=bgZoom+'%';applyBgZoom();};
+document.getElementById('bg-pos-x').oninput=e=>{bgPosX=e.target.value;applyBgZoom();};
+document.getElementById('bg-pos-y').oninput=e=>{bgPosY=e.target.value;applyBgZoom();};
+document.getElementById('bg-img-input').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{bgZoom=100;bgPosX=50;bgPosY=50;document.getElementById('bg-zoom').value=100;document.getElementById('bg-zoom-val').textContent='100%';document.getElementById('bg-pos-x').value=50;document.getElementById('bg-pos-y').value=50;canvas.style.background='none';canvas.style.backgroundImage='url('+ev.target.result+')';canvas.style.backgroundSize='100%';canvas.style.backgroundPosition='50% 50%';canvas.style.backgroundRepeat='no-repeat';canvas._bgImg=true;showBgZoomCtrl(true);snap();};r.readAsDataURL(f);e.target.value='';};
 
 document.getElementById('file-input').onchange=e=>{[...e.target.files].forEach(f=>{const r=new FileReader();r.onload=ev=>addImage(ev.target.result,f.name.replace(/\.[^.]+$/,'').slice(0,14));r.readAsDataURL(f);});e.target.value='';};
 canvas.addEventListener('dragover',e=>e.preventDefault());
