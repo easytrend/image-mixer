@@ -154,6 +154,32 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
   #bg-img-btn{font-size:9px;height:18px}
   #sig-modal{width:92vw;padding:12px}
 }
+
+/* ── Touch devices (incl. "Desktop site" on phones) ── */
+@media (hover:none) and (pointer:coarse){
+  body{overflow:auto}
+  #app{height:auto;min-height:100vh}
+  #body,#main{overflow:visible}
+
+  /* Keep tools reachable even if bars wrap */
+  #bottom-bar{
+    position:sticky;
+    bottom:0;
+    z-index:5000;
+  }
+}
+
+/* Short viewports (landscape phones) */
+@media (max-height:520px){
+  body{overflow:auto}
+  #app{height:auto;min-height:100vh}
+  #body,#main{overflow:visible}
+  #bottom-bar{
+    position:sticky;
+    bottom:0;
+    z-index:5000;
+  }
+}
 </style>
 </head>
 <body>
