@@ -113,7 +113,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
 .rot-handle.txt-rot{background:#0f0f14;border:2px solid #4a9edd}
 .size-tag{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);background:#161620;color:#666;font-size:7px;padding:1px 3px;border-radius:2px;white-space:nowrap;pointer-events:none;border:.5px solid #2a2a3a;z-index:20;display:none}
 .c-node.selected .size-tag{display:block}
-#bottom-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:6px 10px;border-top:1px solid #1e1e2e;background:#0d0d12;flex-shrink:0}
+#bottom-bar{display:flex;align-items:center;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding:6px 10px;border-top:1px solid #1e1e2e;background:#0d0d12;flex-shrink:0;-webkit-overflow-scrolling:touch}
 .bb-row{display:contents}/* desktop: transparent wrapper, items flow flat */
 .bb-lbl{font-size:10px;color:#fff;font-weight:700}
 #bg-color{width:22px;height:22px;border:.5px solid #2a2a3a;border-radius:3px;cursor:pointer;padding:0}
@@ -142,7 +142,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
 #sig-cancel:hover{background:#2a2a3a}
 
 /* ── Mobile responsive ── */
-@media(max-width:600px){
+@media(max-width:900px){
   /* 1. Allow full-page scrolling */
   body{overflow:auto}
   /* 2. Let the app grow to fit content */
