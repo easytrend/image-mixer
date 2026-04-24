@@ -113,14 +113,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
 .rot-handle.txt-rot{background:#0f0f14;border:2px solid #4a9edd}
 .size-tag{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);background:#161620;color:#666;font-size:7px;padding:1px 3px;border-radius:2px;white-space:nowrap;pointer-events:none;border:.5px solid #2a2a3a;z-index:20;display:none}
 .c-node.selected .size-tag{display:block}
-#bottom-bar{display:flex;flex-direction:column;gap:5px;padding:6px 10px;border-top:1px solid #1e1e2e;background:#0d0d12;flex-shrink:0}
-.bb-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#bottom-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:6px 10px;border-top:1px solid #1e1e2e;background:#0d0d12;flex-shrink:0}
+.bb-row{display:contents}/* desktop: transparent wrapper, items flow flat */
 .bb-lbl{font-size:10px;color:#fff;font-weight:700}
 #bg-color{width:22px;height:22px;border:.5px solid #2a2a3a;border-radius:3px;cursor:pointer;padding:0}
 #bg-pattern,#fmt-sel,#res-sel,#quality-sel{font-size:10px;padding:2px 4px;border-radius:4px;border:.5px solid #2a2a3a;background:#161620;color:#ffffff;font-weight:700;height:20px}
 #bg-img-btn{font-size:10px;padding:2px 8px;cursor:pointer;border-radius:4px;border:.5px solid #333;background:#161620;color:#ffffff;font-weight:700;height:20px}
 #bg-img-btn:hover{background:#222;color:#fff}
-#save-btn{font-size:11px;padding:4px 14px;cursor:pointer;border-radius:5px;border:1px solid #ff6b2b55;background:#1e0d05;color:#ff6b2b;font-weight:600;white-space:nowrap}
+#save-btn{margin-left:auto;font-size:11px;padding:4px 14px;cursor:pointer;border-radius:5px;border:1px solid #ff6b2b55;background:#1e0d05;color:#ff6b2b;font-weight:600;white-space:nowrap}
 #save-btn:hover{background:#ff6b2b;color:#fff}
 #empty-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;z-index:0}
 #empty-hint p{font-size:13px;color:#333}
@@ -178,16 +178,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#07070e;color:#e0e0e
   #main{overflow:visible;min-width:0}
   #canvas-wrap{overflow:auto;min-height:240px;-webkit-overflow-scrolling:touch}
 
-  /* Bottom bar: tools row scrollable + save button full-width */
-  #bottom-bar{padding:8px;gap:6px}
-  .bb-row{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;gap:5px}
+  /* Bottom bar: column layout + tools row scrollable + save button full-width */
+  #bottom-bar{flex-direction:column;align-items:stretch;padding:8px;gap:6px}
+  .bb-row{display:flex;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;gap:5px}
   .bb-lbl{font-size:9px;flex-shrink:0}
   #bg-color{flex-shrink:0}
   #bg-pattern,#fmt-sel,#res-sel,#quality-sel{font-size:9px;height:20px;flex-shrink:0}
   #bg-img-btn{font-size:9px;height:20px;flex-shrink:0}
   /* Save button — full-width, tall, easy to tap */
   #bb-row-save{width:100%}
-  #save-btn{width:100%;font-size:14px;padding:12px 0;text-align:center;border-radius:8px;border:2px solid #ff6b2b;background:#1e0d05;color:#ff6b2b;font-weight:700;cursor:pointer;letter-spacing:.3px}
+  #save-btn{margin-left:0;width:100%;font-size:14px;padding:12px 0;text-align:center;border-radius:8px;border:2px solid #ff6b2b;background:#1e0d05;color:#ff6b2b;font-weight:700;cursor:pointer;letter-spacing:.3px}
   #save-btn:active{background:#ff6b2b;color:#fff}
 
   #sig-modal{width:92vw;padding:12px}
